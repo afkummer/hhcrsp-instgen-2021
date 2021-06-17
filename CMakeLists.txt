@@ -40,6 +40,9 @@ message("-- Using compilation flags of mode \"" ${CMAKE_BUILD_TYPE} "\"")
 # Creates the binaries relative to the project.
 add_executable(instGen
    src/main.cpp
+   src/WeeklyData.cpp
+   src/GeneratorParameters.cpp
+   src/EuclideanGenerator.cpp
 )
 target_link_libraries(instGen osrm -lboost_program_options)
 

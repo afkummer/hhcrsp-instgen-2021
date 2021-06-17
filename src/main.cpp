@@ -1,4 +1,8 @@
+#include "EuclideanGenerator.h" 
+#include "WeeklyData.h"
+
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 
 #include <boost/program_options.hpp>
@@ -44,13 +48,19 @@ int main(int argc, char* argv[]) {
    cout << "Configuration file: " << configFile << "\n";
    cout << "Override of number of days: ";
    if (overrideDays != -1) {
-      cout << overrideDays << " days\n";
+      cout << overrideDays << " day(s)\n";
    } else {
       cout << "override disabled\n";
    }
 
+   mt19937 rng(seed);
+   auto locGen = EuclideanGenerator(rng, 100, 100);
 
-   
+   auto params = GeneratorParameters(rng, locGen);
+   auto instGen = WeeklyData(params);
+
+   instGen.generateData();
+   instGen.writeDailyData(0);
    
    return EXIT_SUCCESS;
 }

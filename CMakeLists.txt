@@ -6,6 +6,7 @@ project(hhcrsp-instgen-2021)
 
 # Builds the osrm-backend dependency prior setting our project flags.
 # This need to be defined before the other settings to not polute OSRM build.
+message("-- Configuring dependency 'OSRM'")
 add_subdirectory(osrm-backend)
 
 # General project definitions. Assumes g++ being used to compile the code.
@@ -37,7 +38,8 @@ endif()
 message("-- Using compilation flags of mode \"" ${CMAKE_BUILD_TYPE} "\"")
 
 # Creates the binaries relative to the project.
-add_executable(instgen
+add_executable(instGen
    src/main.cpp
 )
+target_link_libraries(instGen osrm -lboost_program_options)
 

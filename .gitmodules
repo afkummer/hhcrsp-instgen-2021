@@ -1,6 +1,6 @@
 [submodule "ovig"]
 	path = ovig
-	url = https://github.com/cssartori/ovig.git
+	url = https://github.com/afkummer/ovig-lh.git
 [submodule "osrm-backend"]
 	path = osrm-backend
 	url = https://github.com/Project-OSRM/osrm-backend.git

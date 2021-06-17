@@ -4,7 +4,7 @@
 
 using namespace std;
 
-GeneratorParameters::GeneratorParameters(std::mt19937 &rng, LocationGeneratorI &locGen): 
+GeneratorParameters::GeneratorParameters(std::mt19937 &rng, LocationGeneratorI &locGen):
    m_rng(rng), m_locGen(locGen) {
 
    m_numDays = 1;
@@ -39,6 +39,10 @@ int GeneratorParameters::numDailyPatients() const {
 
 int GeneratorParameters::numSkills() const {
    return m_numSkills;
+}
+
+int GeneratorParameters::poolSizeOverride() const {
+   return 100;
 }
 
 double GeneratorParameters::simultaneousDoubleServicesPerc() const {

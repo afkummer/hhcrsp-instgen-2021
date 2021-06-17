@@ -21,6 +21,8 @@ public:
    int numDailyPatients() const;
    int numSkills() const;
 
+   int poolSizeOverride() const;
+
    double simultaneousDoubleServicesPerc() const;
    double precedenceDoubleServicesPerc() const;
 

@@ -10,7 +10,7 @@
 using namespace std;
 
 WeeklyData::WeeklyData(GeneratorParameters &param): m_params(param) {
-
+   // Empty
 }
 
 WeeklyData::~WeeklyData() {
@@ -19,7 +19,7 @@ WeeklyData::~WeeklyData() {
 
 void WeeklyData::generateData() {
    generateSkillPartitions();
-   
+
    m_carerQualif.resize(m_params.numCaregivers());
    for (auto &i: m_carerQualif) {
       i.resize(m_params.numSkills(), 0);
@@ -168,7 +168,7 @@ void WeeklyData::writeDailyData(int day) const {
       fid << get<1>(m_tw[i][day]) << " ";
    }
    fid << "99999\n";
-   
+
 
    cout << "Instance of day " << day << " exported sucessfully.\n";
    cout << "File written: " << fidName << ".\n";
@@ -229,7 +229,7 @@ void WeeklyData::generateCaregivers() {
       shuffle(skills.begin(), skills.end(), m_params.prng());
 
       uniform_int_distribution caregiverDist(ci, cj-1);
-      
+
       for (int s: skills) {
          if (numCaregiversWithSkill(s) == 0) {
             for (;;) {
@@ -265,14 +265,18 @@ void WeeklyData::setCaregiverSkill(int caregiver, int skill) {
 }
 
 void WeeklyData::generatePatientsPool() {
-   uniform_int_distribution<int> dist(
-      m_params.minPatientsPerSkillUnit(), 
-      m_params.maxPatientsPerSkillUnit()
-   );
+   if (m_params.poolSizeOverride() == -1) {
+      uniform_int_distribution<int> dist(
+         m_params.minPatientsPerSkillUnit(),
+         m_params.maxPatientsPerSkillUnit()
+      );
 
-   m_poolSize = 0;
-   for (int s = 0; s < m_params.numSkills(); ++s) {
-      m_poolSize += dist(m_params.prng()) * numCaregiversWithSkill(s);
+      m_poolSize = 0;
+      for (int s = 0; s < m_params.numSkills(); ++s) {
+         m_poolSize += dist(m_params.prng()) * numCaregiversWithSkill(s);
+      }
+   } else {
+      m_poolSize = m_params.poolSizeOverride();
    }
 
    m_tw.resize(m_poolSize);
@@ -331,10 +335,10 @@ void WeeklyData::generateDailyData(int day) {
       vector <int> patients(m_poolSize);
       iota(begin(patients), end(patients), 0);
       shuffle(begin(patients), end(patients), m_params.prng());
-      
+
       patients.resize(m_params.numDailyPatients());
       m_patients[day] = patients;
-      
+
       for (int i: patients)
          m_patientDays[i][day] = 1;
    };
@@ -356,7 +360,7 @@ void WeeklyData::generateDailyData(int day) {
    // of caregivers qualified to each each skill.
    discrete_distribution <int> demandDist(m_carerPerSkill.begin(), m_carerPerSkill.end());
    uniform_int_distribution <int> procTimeDist(m_params.minProcTime(), m_params.maxProcTime());
-   
+
    // Caches the last required skill set to the patient.
    vector<int> demCache(m_poolSize, -1);
 
@@ -369,7 +373,7 @@ void WeeklyData::generateDailyData(int day) {
          demCache[i] = s;
       }
    };
-   // generateSingleDemands();
+   generateSingleDemands();
 
    // Compute the number of double service patients.
    // Considers explicitly the proportion of simultaneous and precedence DS.
@@ -378,7 +382,7 @@ void WeeklyData::generateDailyData(int day) {
    // fix this behavior.
    int numSimult = m_params.simultaneousDoubleServicesPerc() * m_params.numDailyPatients();
    int numPred = m_params.precedenceDoubleServicesPerc() * m_params.numDailyPatients();
-   
+
    vector <int> dsPatients = m_patients[day];
    shuffle(dsPatients.begin(), dsPatients.end(), m_params.prng());
    size_t dsPos = 0;
@@ -397,7 +401,7 @@ void WeeklyData::generateDailyData(int day) {
                break;
          }
          assert(accumulate(m_demands[i][day].begin(), m_demands[i][day].end(), 0) == 1);
-         
+
          m_demands[i][day][s] = 1;
          m_procTimes[i][day][s] = procTimeDist(m_params.prng());
          demCache[i] = s;
@@ -418,6 +422,6 @@ void WeeklyData::generateDailyData(int day) {
       }
    };
 
-   // generateDoubleDemands(0, 0, numSimult);
-   // generateDoubleDemands(m_params.minSeparation(), m_params.maxSeparation(), numPred);
+   generateDoubleDemands(0, 0, numSimult);
+   generateDoubleDemands(m_params.minSeparation(), m_params.maxSeparation(), numPred);
 }

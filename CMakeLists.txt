@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.4)
 # Define the project name.
 project(hhcrsp-instgen-2021)
 
+# Builds the osrm-backend dependency prior setting our project flags.
+# This need to be defined before the other settings to not polute OSRM build.
+add_subdirectory(osrm-backend)
+
 # General project definitions. Assumes g++ being used to compile the code.
 add_definitions(
    -std=c++17
@@ -16,9 +20,6 @@ add_definitions(
 # Set some include directories to the compiler look for header files of project dependencies.
 include_directories(osrm-backend/include)
 include_directories(ovig/include)
-
-# Builds the osrm-backend dependency prior setting our project flags.
-add_subdirectory(osrm-backend)
 
 # Add the source code directory to the compiler include path.
 include_directories(src)
